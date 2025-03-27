@@ -1,0 +1,63 @@
+﻿.table-responsive {
+    max-height: calc(100vh - 170px);
+    overflow-y: auto
+}
+
+table.dataTable {
+    border-collapse: collapse !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+#dataTable_wrapper {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 180px);
+}
+
+#dataTable thead {
+    position: sticky;
+    top: 0;
+    background: #343a40;
+    color: white;
+    z-index: 10;
+}
+
+#dataTable_wrapper .top {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 20;
+    padding-bottom: 5px;
+}
+
+#dataTable_wrapper .bottom {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    z-index: 20;
+    padding-top: 5px;
+}
+
+#dataTable tbody {
+    overflow-y: auto;
+    max-height: calc(100vh - 300px);
+}
+
+#dataTable tbody tr td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dataTables_filter input {
+    height: 44px;
+    width: 320px !important;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.date-filter-container {
+    width: 50%;
+}
