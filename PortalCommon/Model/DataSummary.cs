@@ -12,5 +12,7 @@ namespace PortalCommon.Model
         public double Max { get; set; }
         public double Average { get; set; }
         public string MostExpensiveHour { get; set; }
+        public string BestBuyTime { get; set; }  
+        public string BestSellTime { get; set; } 
     }
 }

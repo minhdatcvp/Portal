@@ -4,18 +4,16 @@
         processing: true,
         serverSide: true,
         ajax: function (data, callback) {
-            debugger
             var orders = data.order.map(o => ({
                 sortBy: data.columns[o.column].data,
                 sortOrder: o.dir 
             }));
-            debugger
             var pageSize = data.length;
             var page = (data.start / pageSize) + 1;
             var selectedDate = $('#dateFilter').val();
 
             $.ajax({
-                url: "https://localhost:7193/api/MarketData",
+                url: `${BASE_URL}/MarketData`,
                 type: "GET",
                 data: {
                     page: page,

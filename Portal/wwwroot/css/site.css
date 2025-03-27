@@ -16,3 +16,12 @@ html {
   position: relative;
   min-height: 100%;
 }
+
+.filter-input {
+    display: inline-block;
+    width: auto;
+}
+
+label{
+    min-width: 75px;
+}

@@ -19,7 +19,7 @@ namespace PortalService.Services
             _logger = logger;
         }
 
-        public DataResponse GetData()
+        public DataResponse GetChartData(DateTime? startDate, DateTime? endDate)
         {
             var result = new DataResponse();
 
@@ -31,6 +31,16 @@ namespace PortalService.Services
                 {
                     _logger.LogWarning("No data available.");
                     return new DataResponse { Data = new List<DataPoint>(), DataSummary = new DataSummary() };
+                }
+
+                // Lọc dữ liệu theo khoảng thời gian nếu có tham số
+                if (startDate.HasValue)
+                {
+                    data = data.Where(d => d.Date >= startDate.Value).ToList();
+                }
+                if (endDate.HasValue)
+                {
+                    data = data.Where(d => d.Date < endDate.Value.AddDays(1)).ToList();
                 }
 
                 // Tính toán giá trị min, max, avg
@@ -56,13 +66,19 @@ namespace PortalService.Services
                     }
                 }
 
+                // Tìm thời điểm nên mua và nên bán
+                var (bestBuyTime, bestSellTime) = GetBestBuySellTimes(data);
+
                 result.Data = data;
                 result.DataSummary = new DataSummary()
                 {
                     Min = minPrice,
                     Max = maxPrice,
                     Average = avgPrice,
-                    MostExpensiveHour = mostExpensiveTime
+                    MostExpensiveHour = mostExpensiveTime,
+                    BestBuyTime = bestBuyTime,
+                    BestSellTime = bestSellTime
+
                 };
 
                 _logger.LogInformation("Successfully processed data. Min: {Min}, Max: {Max}, Avg: {Avg}, Expensive: {ExpensiveTime}",
@@ -135,6 +151,36 @@ namespace PortalService.Services
                 _logger.LogError(ex, "An error occurred while fetching market data.");
                 throw new Exception("An unexpected error occurred while fetching data. Please try again later.");
             }
+        }
+
+        // Tìm thời điểm nên mua và nên bán
+        private (string BestBuyTime, string BestSellTime) GetBestBuySellTimes(List<DataPoint> data)
+        {
+            if (data.Count < 2) return ("N/A", "N/A");
+
+            double minPrice = double.MaxValue;
+            string bestBuyTime = "N/A";
+            string bestSellTime = "N/A";
+            double maxProfit = 0;
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (data[i].Price < minPrice)
+                {
+                    minPrice = data[i].Price;
+                    bestBuyTime = data[i].Date.ToString("yyyy-MM-dd HH:mm");
+                }
+
+                double profit = data[i].Price - minPrice;
+                if (profit > maxProfit)
+                {
+                    maxProfit = profit;
+                    bestSellTime = data[i].Date.ToString("yyyy-MM-dd HH:mm");
+                }
+            }
+
+            if (bestBuyTime == bestSellTime) return ("N/A", "N/A");
+            return (bestBuyTime, bestSellTime);
         }
 
     }

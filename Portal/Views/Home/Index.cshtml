@@ -1,19 +1,31 @@
-﻿@using PortalCommon.Model;
-@model DataResponse
-@{
+﻿@{
     ViewData["Title"] = "Market Data";
 }
 
 <h2>Dashboard</h2>
+<div style="display: flex; align-items: center; gap: 10px;">
+    <!-- Bộ lọc thời gian -->
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" class="form-control filter-input" onchange="validateDate()">
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" class="form-control filter-input" onchange="validateDate()">
+    <button type="button" class="btn btn-primary" onclick="fetchMarketData()">Filter</button>
+</div>
 <div class="row">
     <!-- Biểu đồ -->
     <canvas id="marketChart" class="marketChart"></canvas>
-    <!-- Thông tin thống kê -->
-    <p>📉 Min Price: @Model.DataSummary.Min</p>
-    <p>📈 Max Price: @Model.DataSummary.Max</p>
-    <p>📊 Avg Price: @Model.DataSummary.Average</p>
-    @* <p>💰 Most Expensive Hour: @ViewBag.ExpensiveWindow?.TimeWindow (Total: @ViewBag.ExpensiveWindow?.TotalPrice)</p> *@
-    <p>💰 Most Expensive Hour: @Model.DataSummary.MostExpensiveHour</p>
+    <div class="row">
+        <div class="col-md-6">
+            <p>📉 Min Price: <span id="minPrice">...</span></p>
+            <p>📈 Max Price: <span id="maxPrice">...</span></p>
+            <p>📊 Avg Price: <span id="avgPrice">...</span></p>
+        </div>
+        <div class="col-md-6">
+            <p>💰 Most Expensive Hour: <span id="mostExpensiveHour">...</span></p>
+            <p>🛒 Best Buy Time: <span id="bestBuyTime">...</span></p>
+            <p>💵 Best Sell Time: <span id="bestSellTime">...</span></p>
+        </div>
+    </div>
 </div>
 
 <!-- Script -->
@@ -21,76 +33,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 <script>
-    var labels = @Html.Raw(Json.Serialize(Model.Data.Select(d => d.Date.ToString("dd/MM/yyyy HH:mm"))));
-    var data = @Html.Raw(Json.Serialize(Model.Data.Select(d => d.Price)));
-
-    var ctx = document.getElementById('marketChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Market Price',
-                data: data,
-                borderColor: 'blue',
-                borderWidth: 2,
-                pointRadius: 3, // Giúp dễ nhấn vào từng điểm
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Price summary chart'
-                },
-                zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'xy',
-                    },
-                    zoom: {
-                        wheel: {
-                            enabled: true,
-                        },
-                        pinch: {
-                            enabled: true,
-                        },
-                        mode: 'x',
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        title: function (tooltipItems) {
-                            return tooltipItems[0].label;
-                        },
-                        label: function (tooltipItem) {
-                            return `📊 Price: ${tooltipItem.raw}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    type: 'category',
-                    ticks: {
-                        autoSkip: true,
-                        maxRotation: 0,
-                        callback: function (value, index, ticks) {
-                            let date = labels[index];
-                            if (ticks.length > 20) {
-                                return date.split(' ')[0];
-                            } else {
-                                return date;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    });
+    var BASE_URL = "@ViewBag.BaseUrl";
 </script>
+<script src="~/js/Home/home.js"></script>

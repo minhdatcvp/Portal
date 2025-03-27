@@ -6,12 +6,15 @@ namespace PortalCommon
     {
         public static string FilePath { get; private set; }
         public static string DBConnection { get; private set; }
+        public static string BaseUrl { get; set; }
 
         public static void Initialize(IConfiguration configuration)
         {
             FilePath = configuration.GetValue<string>("DataSettings:FilePath");
 
             DBConnection = configuration.GetValue<string>("DataSettings:DBConnection");
+
+            BaseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl");
         }
     }
 

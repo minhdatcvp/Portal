@@ -16,6 +16,28 @@ namespace Portal.Controllers
             _logger = logger;
         }
 
+        [HttpGet("GetChartData")]
+        public IActionResult GetChartData(DateTime? startDate, DateTime? endDate)
+        {
+            try
+            {
+                var data = _dataFileService.GetChartData(startDate, endDate);
+
+                if (data == null || !data.Data.Any())
+                {
+                    _logger.LogWarning("No market data found.");
+                    return NotFound("No data available.");
+                }
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching market data.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
         [HttpGet]
         public IActionResult GetMarketData(int page = 1, int pageSize = 10, string sortBy = "Date", string sortOrder = "desc", string? search = null)
         {
